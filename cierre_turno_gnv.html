@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Cierre de Turno GNV — EDS Terpel Av. Boyacá</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0e1a;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;font-size:16px;padding-bottom:96px;-webkit-text-size-adjust:100%}
+header{background:#0d1225;border-bottom:2px solid #f59e0b;padding:14px 16px;position:sticky;top:0;z-index:100}
+.hdr{display:flex;justify-content:space-between;align-items:center}
+.hdr-left .brand{color:#f59e0b;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px}
+.hdr-left .title{color:#fff;font-size:17px;font-weight:800;margin-top:3px}
+.hdr-left .subtitle{color:#64748b;font-size:11px;margin-top:2px}
+#clock{color:#f59e0b;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px}
+#err-box{display:none;background:#3b0404;border:1.5px solid #dc2626;border-radius:10px;padding:14px 16px;margin:14px 14px 0}
+#err-box h3{color:#fca5a5;font-size:13px;margin-bottom:10px}
+#err-list{list-style:none;padding:0}
+#err-list li{color:#fca5a5;font-size:13px;padding:3px 0 3px 14px;position:relative}
+#err-list li::before{content:"•";position:absolute;left:2px}
+.sec{margin:14px 14px 0;background:#111827;border-radius:12px;border:1px solid #1e293b;overflow:hidden}
+.sec-hdr{background:#1a2540;padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #1e293b}
+.sec-ico{font-size:18px}
+.sec-ttl{color:#f59e0b;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.8px}
+.sec-body{padding:16px}
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+label{display:block;font-size:12px;color:#64748b;margin-bottom:6px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+input,select{width:100%;background:#0d1225;border:1.5px solid #1e293b;border-radius:8px;color:#e2e8f0;font-size:17px;padding:13px 14px;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none}
+input:focus,select:focus{border-color:#f59e0b;background:#0f1730}
+input.err,select.err{border-color:#dc2626!important;background:#1a0505}
+.hint{font-size:11px;color:#475569;margin-top:5px}
+.hint.warn{color:#f59e0b;font-weight:700}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gnv-total{background:#071a0f;border:1.5px solid #16a34a;border-radius:10px;padding:13px 15px;margin-top:6px;display:flex;justify-content:space-between;align-items:center}
+.gnv-total-lbl{font-size:12px;color:#86efac;font-weight:800;text-transform:uppercase}
+#total-gnv{font-size:24px;font-weight:800;color:#22c55e}
+.medios-hint{font-size:11px;color:#334155;margin-bottom:12px;background:#0d1225;border-radius:6px;padding:6px 10px;border-left:2px solid #3b82f6}
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:13px 15px;border-radius:10px;margin-bottom:10px;border:1.5px solid transparent}
+.sum-row:last-child{margin-bottom:0}
+.sum-row.v{background:#071a0f;border-color:#16a34a}
+.sum-row.m{background:#050d1a;border-color:#1d4ed8}
+.sum-row.d{background:#0d1225;border-color:#334155}
+.sum-lbl{font-size:12px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.4px}
+.sum-val{font-size:24px;font-weight:800}
+.sum-val.green{color:#22c55e}
+.sum-val.blue{color:#60a5fa}
+.sum-val.cuadrado{color:#22c55e}
+.sum-val.faltante{color:#ef4444}
+.sum-val.sobrante{color:#f59e0b}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;padding:4px 10px;border-radius:20px;margin-top:5px}
+.badge.cuadrado{background:#14532d;color:#86efac}
+.badge.faltante{background:#450a0a;color:#fca5a5}
+.badge.sobrante{background:#431407;color:#fed7aa}
+.sum-right{text-align:right}
+.bot-bar{position:fixed;bottom:0;left:0;right:0;background:#0d1225;border-top:2px solid #1e293b;padding:10px 14px;display:flex;gap:10px;z-index:200;box-shadow:0 -4px 20px rgba(0,0,0,.6)}
+.btn{flex:1;padding:15px 10px;border-radius:10px;border:none;font-size:15px;font-weight:800;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;transition:opacity .15s,transform .1s}
+.btn:active{opacity:.75;transform:scale(.97)}
+.btn-clr{background:#1e293b;color:#94a3b8;border:1.5px solid #334155}
+.btn-send{background:linear-gradient(135deg,#f59e0b,#d97706);color:#0a0e1a;box-shadow:0 4px 14px rgba(245,158,11,.3)}
+.btn-send:disabled{background:#451a03;color:#78350f;box-shadow:none;cursor:not-allowed}
+#toast{display:none;position:fixed;top:76px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:10px;font-size:14px;font-weight:800;z-index:400;text-align:center;min-width:240px;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr">
+    <div class="hdr-left">
+      <div class="brand">⛽ EDS Terpel Av. Boyacá</div>
+      <div class="title">Cierre de Turno GNV</div>
+      <div class="subtitle">Gas Natural Vehicular</div>
+    </div>
+    <div id="clock">--:--:--</div>
+  </div>
+</header>
+
+<div id="err-box">
+  <h3>⚠️ Campos pendientes por diligenciar:</h3>
+  <ul id="err-list"></ul>
+</div>
+
+<div id="toast"></div>
+
+<div class="sec">
+  <div class="sec-hdr"><span class="sec-ico">👤</span><span class="sec-ttl">Identificación del Turno</span></div>
+  <div class="sec-body">
+    <div class="g2">
+      <div class="field">
+        <label>Promotor/a</label>
+        <input type="text" id="promotor" placeholder="Nombre completo" autocomplete="name" autocorrect="off">
+      </div>
+      <div class="field">
+        <label>Turno</label>
+        <select id="turno">
+          <option value="">Seleccione</option>
+          <option value="Mañana">☀️ Mañana</option>
+          <option value="Tarde">🌤️ Tarde</option>
+          <option value="Noche">🌙 Noche</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Fecha</label>
+      <input type="date" id="fecha">
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-hdr"><span class="sec-ico">🔵</span><span class="sec-ttl">GNV — Gas Natural Vehicular</span></div>
+  <div class="sec-body">
+    <div class="g2">
+      <div class="field">
+        <label>Precio x M³</label>
+        <input type="number" id="precio-gnv" inputmode="numeric" placeholder="Ej: 2150" min="0" step="1">
+        <div class="hint warn">⚠️ Solo enteros — sin puntos ni comas</div>
+      </div>
+      <div class="field">
+        <label>M³ Vendidos</label>
+        <input type="text" id="m3-gnv" inputmode="decimal" placeholder="Ej: 1234.5">
+        <div class="hint">Decimales: use punto o coma</div>
+      </div>
+    </div>
+    <div class="gnv-total">
+      <span class="gnv-total-lbl">💰 Total GNV</span>
+      <span id="total-gnv">$ 0</span>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-hdr"><span class="sec-ico">💳</span><span class="sec-ttl">Medios de Pago</span></div>
+  <div class="sec-body">
+    <div class="medios-hint">Solo números enteros — sin puntos ni comas</div>
+    <div class="g2">
+      <div class="field"><label>Efectivo</label><input type="number" id="efectivo" inputmode="numeric" placeholder="0" min="0" step="1"></div>
+      <div class="field"><label>Rumbo</label><input type="number" id="rumbo" inputmode="numeric" placeholder="0" min="0" step="1"></div>
+      <div class="field"><label>Clientes Propios EDS</label><input type="number" id="clientes-eds" inputmode="numeric" placeholder="0" min="0" step="1"></div>
+      <div class="field"><label>Bonos</label><input type="number" id="bonos" inputmode="numeric" placeholder="0" min="0" step="1"></div>
+      <div class="field"><label>Moneda</label><input type="number" id="moneda" inputmode="numeric" placeholder="0" min="0" step="1"></div>
+    </div>
+  </div>
+</div>
+
+<div class="sec" style="margin-bottom:0">
+  <div class="sec-hdr"><span class="sec-ico">📊</span><span class="sec-ttl">Resumen del Turno</span></div>
+  <div class="sec-body">
+    <div class="sum-row v"><span class="sum-lbl">Total Ventas GNV</span><span class="sum-val green" id="res-ventas">$ 0</span></div>
+    <div class="sum-row m"><span class="sum-lbl">Total Medios de Pago</span><span class="sum-val blue" id="res-medios">$ 0</span></div>
+    <div class="sum-row d">
+      <span class="sum-lbl">Diferencia</span>
+      <div class="sum-right">
+        <div class="sum-val cuadrado" id="res-diff-val">$ 0</div>
+        <div class="badge cuadrado" id="diff-badge">✅ Cuadrado</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bot-bar">
+  <button class="btn btn-clr" onclick="limpiar()">🗑 Limpiar</button>
+  <button class="btn btn-send" id="btn-send" onclick="enviar()">📤 Enviar al Administrador</button>
+</div>
+
+<script>
+const SHEETS_URL = "https://script.google.com/macros/s/TU_URL_DEL_SCRIPT_AQUI/exec";
+
+function tick(){
+  const n=new Date(),pad=x=>String(x).padStart(2,'0');
+  document.getElementById('clock').textContent=`${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
+}
+setInterval(tick,1000);tick();
+document.getElementById('fecha').value=new Date().toISOString().split('T')[0];
+
+const fmtPeso=n=>'$ '+(isNaN(n)?0:Math.round(n)).toLocaleString('es-CO');
+const parseM3=v=>parseFloat(String(v).replace(',','.'));
+
+function calcular(){
+  const precio=parseInt(document.getElementById('precio-gnv').value)||0;
+  const m3Raw=document.getElementById('m3-gnv').value.trim();
+  const m3=m3Raw?parseM3(m3Raw):0;
+  const tGNV=precio*m3;
+  document.getElementById('total-gnv').textContent=fmtPeso(tGNV);
+  document.getElementById('res-ventas').textContent=fmtPeso(tGNV);
+  const ids=['efectivo','rumbo','clientes-eds','bonos','moneda'];
+  const tMedios=ids.reduce((s,id)=>s+(parseInt(document.getElementById(id).value)||0),0);
+  document.getElementById('res-medios').textContent=fmtPeso(tMedios);
+  const diff=tMedios-tGNV;
+  const dv=document.getElementById('res-diff-val'),db=document.getElementById('diff-badge');
+  dv.textContent=fmtPeso(Math.abs(diff));
+  if(diff===0){dv.className='sum-val cuadrado';db.className='badge cuadrado';db.textContent='✅ Cuadrado';}
+  else if(diff<0){dv.className='sum-val faltante';db.className='badge faltante';db.textContent='▲ Faltante';}
+  else{dv.className='sum-val sobrante';db.className='badge sobrante';db.textContent='▼ Sobrante';}
+}
+['precio-gnv','m3-gnv','efectivo','rumbo','clientes-eds','bonos','moneda'].forEach(id=>document.getElementById(id).addEventListener('input',calcular));
+
+const obligatorios=[
+  {id:'promotor',nombre:'Promotor/a'},{id:'turno',nombre:'Turno'},{id:'fecha',nombre:'Fecha'},
+  {id:'precio-gnv',nombre:'Precio x M³'},{id:'m3-gnv',nombre:'M³ Vendidos'},
+  {id:'efectivo',nombre:'Efectivo'},{id:'rumbo',nombre:'Rumbo'},
+  {id:'clientes-eds',nombre:'Clientes Propios EDS'},{id:'bonos',nombre:'Bonos'},{id:'moneda',nombre:'Moneda'}
+];
+
+function validar(){
+  const errs=[];
+  obligatorios.forEach(c=>{const el=document.getElementById(c.id);el.classList.remove('err');if(!el.value||!el.value.trim()){errs.push(c.nombre);el.classList.add('err');}});
+  return errs;
+}
+
+async function enviar(){
+  const errs=validar();
+  const box=document.getElementById('err-box'),lst=document.getElementById('err-list');
+  if(errs.length){lst.innerHTML=errs.map(e=>`<li>${e}</li>`).join('');box.style.display='block';window.scrollTo({top:0,behavior:'smooth'});return;}
+  box.style.display='none';
+  const precio=parseInt(document.getElementById('precio-gnv').value);
+  const m3=parseM3(document.getElementById('m3-gnv').value);
+  const tGNV=Math.round(precio*m3);
+  const ef=parseInt(document.getElementById('efectivo').value)||0;
+  const ru=parseInt(document.getElementById('rumbo').value)||0;
+  const cl=parseInt(document.getElementById('clientes-eds').value)||0;
+  const bo=parseInt(document.getElementById('bonos').value)||0;
+  const mo=parseInt(document.getElementById('moneda').value)||0;
+  const tMedios=ef+ru+cl+bo+mo;
+  const diff=tMedios-tGNV;
+  const estado=diff===0?'Cuadrado':diff<0?'Faltante':'Sobrante';
+  const n=new Date(),pad=x=>String(x).padStart(2,'0');
+  const datos={
+    Fecha:document.getElementById('fecha').value,Hora:`${pad(n.getHours())}:${pad(n.getMinutes())}`,
+    Promotor:document.getElementById('promotor').value.trim(),Turno:document.getElementById('turno').value,
+    PrecioM3:precio,M3Vendidos:parseFloat(m3.toFixed(3)),TotalGNV:tGNV,
+    Efectivo:ef,Rumbo:ru,ClientesEDS:cl,Bonos:bo,Moneda:mo,
+    TotalMedios:tMedios,Diferencia:Math.round(Math.abs(diff)),Estado:estado
+  };
+  const btn=document.getElementById('btn-send');
+  btn.disabled=true;btn.textContent='⏳ Enviando...';
+  try{
+    await fetch(SHEETS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(datos)});
+    toast('✅ Enviado correctamente al Administrador',false);
+    setTimeout(()=>limpiar(),2800);
+  }catch(e){toast('❌ Error al enviar. Verifique conexión.',true);}
+  finally{btn.disabled=false;btn.textContent='📤 Enviar al Administrador';}
+}
+
+function limpiar(){
+  ['promotor','precio-gnv','m3-gnv','efectivo','rumbo','clientes-eds','bonos','moneda'].forEach(id=>{document.getElementById(id).value='';document.getElementById(id).classList.remove('err');});
+  document.getElementById('turno').value='';document.getElementById('turno').classList.remove('err');
+  document.getElementById('fecha').value=new Date().toISOString().split('T')[0];
+  document.getElementById('err-box').style.display='none';
+  calcular();window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function toast(msg,error){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.background=error?'#450a0a':'#14532d';
+  t.style.color=error?'#fca5a5':'#86efac';t.style.border=`1px solid ${error?'#dc2626':'#16a34a'}`;
+  t.style.display='block';setTimeout(()=>t.style.display='none',3200);
+}
+calcular();
+</script>
+</body>
+</html>
